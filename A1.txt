@@ -1,0 +1,56 @@
+CISC/CMPE 457 Assignment 1
+
+Due October 11 before class
+
+In this assignment you'll build an image editor.  You may work in
+groups of two.  Graduate students must work individually.
+
+1. Get the main.py code running.
+
+2. Modify the code so that brightness is adjusted with mouse dragging
+   left and right, while contrast is adjusted with mouse dragging up
+   and down.  You'll need two global variables for the linear contrast
+   and brightness transformation.
+
+3. Modify the code so that there's a "current image" upon which the
+   current operation is applied.  As long as the mouse is being moved,
+   the operation is applied to the current image.  Once the mouse is
+   released, the current image is replaced with the new image.
+
+   The 'l' key should load a new current image.  The 's' key should
+   save the current image.
+
+4. Perform histogram equalization upon 'h' being pressed.  Also output
+   the histogram as 256 numbers on one line, where the i^{th} number
+   is the intensity in [0,255] to which the original intensity i gets
+   mapped, for i in [0,255]
+
+5. Load a filter upon 'f' being pressed.  The filters are in the format
+
+     xdim ydim
+     scaleFactor
+     ... data ...
+
+   The scaleFactor is applied to the filter data after it's loaded.
+   See examples in the 'filters' directory.
+
+6. Apply the filter to the whole image upon 'a' being pressed.  Use
+   convolution as described in class (i.e. flipping the filter).
+
+7. Appy the filter within a radius, r, of the mouse when the RIGHT
+   mouse button is clicked or dragged.  Adjust r by pressing '+' (or
+   '=') and '-' (or '_').  For each step that the mouse is dragged
+   (i.e. each call to "motion"), the current image should be updated
+   immediately.
+
+To submit:
+
+In a single directory called 'a1' put the following files:
+
+  README.txt - containing the name, student number, and netID of each
+               person working on the assignment.  Include here any
+               comments you have for the TA. 
+
+  main.py    - the modified code, well commented.
+
+For marking, we will read your code and will run your code.
