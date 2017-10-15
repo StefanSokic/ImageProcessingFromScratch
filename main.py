@@ -3,7 +3,6 @@
 # You'll need Python 2.7 and must install these packages:
 #
 #   numpy, PyOpenGL, Pillow
-from __future__ import division
 
 from math import *
 import sys, os, numpy
@@ -170,17 +169,17 @@ def equalize(freqs):
     current = 0
 
     for key in sorted(freqs.iterkeys()):
-        pn = freqs[key]/num_pixels
+        pn = freqs[key]/float(num_pixels)
         current += pn
         new_val = floor((current*(L-1)))
         map[key] = new_val
 
     maximum = map[max(map)]
-    normalizer = maximum/256
+    normalizer = maximum/256.0
 
     # normalize histogram
     for key in map.iterkeys():
-        map[key] = map[key]/normalizer
+        map[key] = map[key]/float(normalizer)
 
     return map
 
