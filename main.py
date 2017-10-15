@@ -32,7 +32,7 @@ windowHeight =  800
 factor = 1 # factor by which luminance is scaled
 filter = [1]
 apply_filter = False
-radius = [0, 0]
+radius = []
 
 
 
@@ -85,7 +85,8 @@ def buildImage():
   # Build destination image from source image
   #y_vals = []
 
-  if radius != [0, 0]:
+  # if radius != [0, 0]:
+  #   print radius
     # i = radius[0]
     # j = radius[1]
     # final_y = 0
@@ -110,6 +111,11 @@ def buildImage():
       #   print 'srcPixels[i,j+1][0]', srcPixels[i,j+1][0]
       # except IndexError:
       #   print 0
+
+      if radius == [i, j] and radius[0] + 50 < i and radius[1] + 50 < j :
+        print radius
+        # large of a radius do we want to start with? make it 50?, declared up there?
+        # loop through the filter like before
 
       # ---- MODIFY PIXEL ----
       #y_vals.append(y)
