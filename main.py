@@ -3,7 +3,9 @@
 # You'll need Python 2.7 and must install these packages:
 #
 #   numpy, PyOpenGL, Pillow
+from __future__ import division
 
+from math import *
 import sys, os, numpy
 import math
 from collections import Counter
@@ -39,7 +41,7 @@ radius = []
 # Image directory and pathe to image file
 
 imgDir      = 'images'
-imgFilename = 'barbara.png'
+imgFilename = 'veggies.jpg'
 
 imgPath = os.path.join( imgDir, imgFilename )
 
@@ -100,6 +102,7 @@ def buildImage():
     #       final_y += filter[row][px] * 0
     # srcPixels[i, j][0] = int(final_y)
 
+  y_vals = []
   for i in range(width):
     for j in range(height):
 
@@ -118,7 +121,7 @@ def buildImage():
         # loop through the filter like before
 
       # ---- MODIFY PIXEL ----
-      #y_vals.append(y)
+      y_vals.append(y)
       y = int(factor * y)
       if filter != [1] and apply_filter:
         final_y = 0
@@ -137,15 +140,49 @@ def buildImage():
       # write destination pixel (while flipping the image in the vertical direction)
       dstPixels[i, height-j-1] = (y,cb,cr)
 
-  # Done
-  #freqs = Counter(y_vals)
-  #freqs = equalize(freqs, y_vals)
-  #plt.bar(freqs.keys(), freqs.values())
-  #plt.show()
+  freqs = Counter(y_vals)  # creates a Counter object of all pixel y-values
+  equal = equalize(add_missing_vals(freqs))  # creates cumulative distribution function
+
+  #  for each pixel in y_vals, maps to corresponding pixel value using cumulative distribution function
+  new = []
+  for i in y_vals:
+      new.append(equal[i])
+  new_dict = Counter(new)
+
+  #  creates matplotlib histogram
+  plt.bar(new_dict.keys(), new_dict.values())
+  plt.show()
 
   return dst.convert( 'RGB' )
 
 
+def add_missing_vals(freqs):
+    for i in range(256):
+        if i not in freqs:
+            freqs[i] = 0
+    return freqs
+
+
+def equalize(freqs):
+    num_pixels = sum(freqs)
+    L = 256
+    map = {}
+    current = 0
+
+    for key in sorted(freqs.iterkeys()):
+        pn = freqs[key]/num_pixels
+        current += pn
+        new_val = floor((current*(L-1)))
+        map[key] = new_val
+
+    maximum = map[max(map)]
+    normalizer = maximum/256
+
+    # normalize histogram
+    for key in map.iterkeys():
+        map[key] = map[key]/normalizer
+
+    return map
 
 # Set up the display and draw the current image
 
