@@ -150,8 +150,8 @@ def buildImage():
   new_dict = Counter(new)
 
   #  creates matplotlib histogram
-  plt.bar(new_dict.keys(), new_dict.values())
-  plt.show()
+  # plt.bar(new_dict.keys(), new_dict.values())
+  # plt.show()
 
   return dst.convert( 'RGB' )
 
