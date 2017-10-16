@@ -32,7 +32,7 @@ windowHeight =  800
 factor = 1  # factor by which luminance is scaled
 filter = [1] # initial filter
 apply_filter = False # only true when user pressed 'a'
-radius = [] # where the user right clicks
+click_coordinate = [] # where the user right clicks
 
 # Image directory and pathe to image file
 imgDir      = 'images'
@@ -63,25 +63,6 @@ def buildImage():
       # reading the source
       y,cb,cr = srcPixels[i,j]
 
-      # Question 7: working with a radius
-      if radius == [i, j]:
-        # the initial radius is arbitrarily set to 100 to start
-        final_y = 0
-        print radius
-        for k in range(100):
-          # loop through the filter like before
-          # TODO: the filter begins in the wrong place right now
-          for row in range(len(filter)):
-            for px in range(len(filter[row])):
-              # here we multiply the filter by each of the pixel values and add it to the final_y for each location
-              try:
-                final_y += filter[row][px] * srcPixels[i + row, j + px][0]
-                print 'final_y', final_y
-              except IndexError:
-                # this could be fixed by wrapping the image instead of throwing down 0s
-                final_y += filter[row][px] * 0
-          y = int(final_y)
-
       # initial changing of brightness on mouse right/left
       y = int(factor * y)
 
@@ -97,6 +78,22 @@ def buildImage():
             # here we multiply the filter by each of the pixel values and add it to the final_y for each location
             try:
               final_y += filter[row][px] * srcPixels[i+row, j+px][0]
+            except IndexError:
+              # this could be fixed by wrapping the image instead of throwing down 0s
+              final_y += filter[row][px] * 0
+        y = int(final_y)
+
+      # Question 7: working with a click_coordinate
+      if filter != [1] and click_coordinate != [] and click_coordinate[0] <= i+50 and click_coordinate[0] >= i and click_coordinate[1] <= j+50 and click_coordinate[1] >= j:
+        # the initial radiusis arbitrarily set to 100 to start
+        final_y = 0
+        # loop through the filter like before
+        # TODO: the filter begins in the wrong place right now
+        for row in range(len(filter)):
+          for px in range(len(filter[row])):
+            # here we multiply the filter by each of the pixel values and add it to the final_y for each location
+            try:
+              final_y += filter[row][px] * srcPixels[i + row, j + px][0]
             except IndexError:
               # this could be fixed by wrapping the image instead of throwing down 0s
               final_y += filter[row][px] * 0
@@ -236,8 +233,8 @@ def mouse( btn, state, x, y ):
   if state == GLUT_DOWN:
     button = btn
     if button == 2 and filter != [1]:
-      global radius
-      radius = [x,y]
+      global click_coordinate
+      click_coordinate = [x,y]
       glutPostRedisplay()
     initX = x
     initY = y
