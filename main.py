@@ -35,7 +35,8 @@ intercept = 0
 
 filter = [1] # initial filter
 apply_filter = False # only true when user pressed 'a'
-radius = [] # where the user right clicks
+click_coordinate = [] # where the user right clicks
+radius_size = 0
 
 first_pass = True
 equalize = False
@@ -73,28 +74,14 @@ def buildImage():
     for j in range(height):
       # reading the source
       y,cb,cr = srcPixels[i,j]
-      # Question 7: working with a radius
-      if radius == [i, j]:
-        # the initial radius is arbitrarily set to 100 to start
-        final_y = 0
-        print radius
-        for k in range(100):
-          # loop through the filter like before
-          # TODO: the filter begins in the wrong place right now
-          for row in range(len(filter)):
-            for px in range(len(filter[row])):
-              # here we multiply the filter by each of the pixel values and add it to the final_y for each location
-              try:
-                final_y += filter[row][px] * srcPixels[i + row, j + px][0]
-                print 'final_y', final_y
-              except IndexError:
-                # this could be fixed by wrapping the image instead of throwing down 0s
-                final_y += filter[row][px] * 0
 
       # on first load append values so we can build a histogram
       global first_pass
       if first_pass is True:
         y_vals.append(y)
+
+      # initial changing of brightness on mouse right/left
+      y = int(factor * y)
 
       # initial changing of brightness on mouse right/left
       y = int(factor * y) + int(intercept)
@@ -119,9 +106,21 @@ def buildImage():
       if equalize is True:
           y = cdf[y]
 
-      # Question 2: change in brightness with left/right mouse drag
-
-
+      # Question 7: working with a click_coordinate
+      if filter != [1] and click_coordinate != [] and click_coordinate[0] <= (i + 50 + radius_size) and click_coordinate[0] >= i and click_coordinate[1] <= (j + 50 + radius_size) and click_coordinate[1] >= j:
+        # the initial radiusis arbitrarily set to 50 to start
+        final_y = 0
+        # loop through the filter like before
+        # TODO: the filter begins in the wrong place right now
+        for row in range(len(filter)):
+          for px in range(len(filter[row])):
+            # here we multiply the filter by each of the pixel values and add it to the final_y for each location
+            try:
+              final_y += filter[row][px] * srcPixels[i + row, j + px][0]
+            except IndexError:
+              # this could be fixed by wrapping the image instead of throwing down 0s
+              final_y += filter[row][px] * 0
+        y = int(final_y)
 
       # write destination pixel (while flipping the image in the vertical direction)
       dstPixels[i, height-j-1] = (y,cb,cr)
@@ -226,6 +225,7 @@ def get_filter():
   
 # Handle keyboard input
 def keyboard( key, x, y ):
+  global radius_size
   if key == '\033': # ESC = exit
     sys.exit(0)
   elif key == 'l':
@@ -244,6 +244,12 @@ def keyboard( key, x, y ):
   elif key =='h':
       global equalize
       equalize = True
+  # decrease the filter size
+  elif key == '\055' or key == '\137':
+    radius_size -= 25
+  # increase the filter size
+  elif key == '\053' or key == '\075':
+    radius_size += 25
   else:
     print 'key =', key    # DO NOT REMOVE THIS LINE.  It will be used during automated marking.
   glutPostRedisplay()
@@ -282,8 +288,8 @@ def mouse( btn, state, x, y ):
   if state == GLUT_DOWN:
     button = btn
     if button == 2 and filter != [1]:
-      global radius
-      radius = [x,y]
+      global click_coordinate
+      click_coordinate = [x,y]
       glutPostRedisplay()
     initX = x
     initY = y
@@ -295,6 +301,8 @@ def mouse( btn, state, x, y ):
 # Handle mouse motion
 def motion( x, y ):
   global diffX
+  global click_coordinate
+  click_coordinate = [x,y]
   diffX = x - initX
 
   global diffY
