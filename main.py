@@ -29,14 +29,26 @@ except:
 # Globals
 windowWidth  = 600 # window dimensions
 windowHeight =  800
+
 factor = 1  # factor by which luminance is scaled
+intercept = 0
+
 filter = [1] # initial filter
 apply_filter = False # only true when user pressed 'a'
 radius = [] # where the user right clicks
 
+first_pass = True
+equalize = False
+y_vals = []
+cdf = None
+
+diffX = 0
+brighten = False
+x_shift = 0
+
 # Image directory and pathe to image file
 imgDir      = 'images'
-imgFilename = 'veggies.jpg'
+imgFilename = 'mandrill.png'
 imgPath = os.path.join( imgDir, imgFilename )
 
 ##  File dialog
@@ -57,12 +69,10 @@ def buildImage():
   dst = Image.new( 'YCbCr', (width,height) )
   dstPixels = dst.load()
 
-  y_vals = []
   for i in range(width):
     for j in range(height):
       # reading the source
       y,cb,cr = srcPixels[i,j]
-
       # Question 7: working with a radius
       if radius == [i, j]:
         # the initial radius is arbitrarily set to 100 to start
@@ -80,13 +90,16 @@ def buildImage():
               except IndexError:
                 # this could be fixed by wrapping the image instead of throwing down 0s
                 final_y += filter[row][px] * 0
-          y = int(final_y)
+
+      # on first load append values so we can build a histogram
+      global first_pass
+      if first_pass is True:
+        y_vals.append(y)
 
       # initial changing of brightness on mouse right/left
-      y = int(factor * y)
-
-      # appending values so we can build a histogram
-      y_vals.append(y)
+      y = int(factor * y) + int(intercept)
+      if y > 255:
+          y = 255
 
       # Question 6: applying filter to whole image on 'a' press
       if filter != [1] and apply_filter:
@@ -102,23 +115,52 @@ def buildImage():
               final_y += filter[row][px] * 0
         y = int(final_y)
 
+      # Question 4: histogram equalization when 'h' is pressed
+      if equalize is True:
+          y = cdf[y]
+
+      # Question 2: change in brightness with left/right mouse drag
+
+
+
       # write destination pixel (while flipping the image in the vertical direction)
       dstPixels[i, height-j-1] = (y,cb,cr)
 
   # Creating the plot that equalizes the histogram
   freqs = Counter(y_vals)  # creates a Counter object of all pixel y-values
-  equal = equalize(add_missing_vals(freqs))  # creates cumulative distribution function
-  #  for each pixel in y_vals, maps to corresponding pixel value using cumulative distribution function
-  new = []
-  for i in y_vals:
-      new.append(equal[i])
-  new_dict = Counter(new)
+
+
+  '''
+
+  UNCOMMENT TO SHOW ATTEMPT AT QUESTION 2
+  Will plot a line graph depicting pixel intensities, change factor and intercept values to view changes in graph
+
+  factor = 1  # increase factor to increase brightness
+  intercept = 0  # increase intercept to increase contrast
+
+  for index, val in enumerate(y_vals):
+      if val*factor+intercept > 255:
+          y_vals[index] = 255
+      else:
+          y_vals[index] = val*factor+intercept
+  plt.plot(sorted(y_vals))
+  plt.show()
+
+  '''
+
+  global cdf
+  if cdf is None:
+    cdf = equalize(add_missing_vals(freqs))  # creates cumulative distribution function
+
   # comment these back to see the plot
   #  creates matplotlib histogram
   # plt.bar(new_dict.keys(), new_dict.values())
   # plt.show()
-
   return dst.convert( 'RGB' )
+
+
+# def brighten(freqs):
+
 
 
 def add_missing_vals(freqs):
@@ -199,6 +241,9 @@ def keyboard( key, x, y ):
   elif key == 'a':
     global apply_filter
     apply_filter = True
+  elif key =='h':
+      global equalize
+      equalize = True
   else:
     print 'key =', key    # DO NOT REMOVE THIS LINE.  It will be used during automated marking.
   glutPostRedisplay()
@@ -229,6 +274,7 @@ button = None
 initX = 0
 initY = 0
 initFactor = 0
+initIntercept = 0
 
 # Handle mouse click/unclick
 def mouse( btn, state, x, y ):
@@ -242,17 +288,39 @@ def mouse( btn, state, x, y ):
     initX = x
     initY = y
     initFactor = factor
+
   elif state == GLUT_UP:
     button = None
 
 # Handle mouse motion
 def motion( x, y ):
+  global diffX
   diffX = x - initX
+
+  global diffY
   diffY = y - initY
+
   global factor
   factor = initFactor + diffX / float(windowWidth)
-  if factor < 0:
-    factor = 0
+
+  '''
+
+  Additional variables for question 2
+
+  global initFactor
+  initFactor = factor
+  # if factor < 0:
+    # factor = 0
+
+  global intercept
+  intercept = (initIntercept + diffY / float(windowWidth))
+
+  global initIntercept
+  initIntercept = intercept
+
+  '''
+
+
   glutPostRedisplay()
 
 # Run OpenGL
@@ -267,3 +335,5 @@ glutReshapeFunc( reshape )
 glutMouseFunc( mouse )
 glutMotionFunc( motion )
 glutMainLoop()
+
+
