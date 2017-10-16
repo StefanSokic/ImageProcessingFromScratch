@@ -33,6 +33,7 @@ factor = 1  # factor by which luminance is scaled
 filter = [1] # initial filter
 apply_filter = False # only true when user pressed 'a'
 click_coordinate = [] # where the user right clicks
+radius_size = 0
 
 # Image directory and pathe to image file
 imgDir      = 'images'
@@ -84,8 +85,8 @@ def buildImage():
         y = int(final_y)
 
       # Question 7: working with a click_coordinate
-      if filter != [1] and click_coordinate != [] and click_coordinate[0] <= i+50 and click_coordinate[0] >= i and click_coordinate[1] <= j+50 and click_coordinate[1] >= j:
-        # the initial radiusis arbitrarily set to 100 to start
+      if filter != [1] and click_coordinate != [] and click_coordinate[0] <= (i + 50 + radius_size) and click_coordinate[0] >= i and click_coordinate[1] <= (j + 50 + radius_size) and click_coordinate[1] >= j:
+        # the initial radiusis arbitrarily set to 50 to start
         final_y = 0
         # loop through the filter like before
         # TODO: the filter begins in the wrong place right now
@@ -181,6 +182,7 @@ def get_filter():
   
 # Handle keyboard input
 def keyboard( key, x, y ):
+  global radius_size
   if key == '\033': # ESC = exit
     sys.exit(0)
   elif key == 'l':
@@ -196,6 +198,12 @@ def keyboard( key, x, y ):
   elif key == 'a':
     global apply_filter
     apply_filter = True
+  # decrease the filter size
+  elif key == '\055' or key == '\137':
+    radius_size -= 25
+  # increase the filter size
+  elif key == '\053' or key == '\075':
+    radius_size += 25
   else:
     print 'key =', key    # DO NOT REMOVE THIS LINE.  It will be used during automated marking.
   glutPostRedisplay()
