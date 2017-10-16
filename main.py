@@ -252,6 +252,8 @@ def mouse( btn, state, x, y ):
 
 # Handle mouse motion
 def motion( x, y ):
+  global click_coordinate
+  click_coordinate = [x,y]
   diffX = x - initX
   diffY = y - initY
   global factor
