@@ -1,0 +1,65 @@
+CISC/CMPE 457 Assignment 2
+
+Due Monday, November 13 before class
+
+In this assignment you'll use the Fourier Transform (FT) to perform
+convolutions and to remove noise from images.
+
+1. Get the main.py code running.  Press '?' to see the list of options
+   on the console.
+
+   (Note that you can provide command-line arguments if you want to run
+   tests in a non-interactive mode, but you'll have to look at the
+   code to understand this.  We'll use this for marking.)
+
+2. Implement forwardFT().  Implement inverseFT().
+
+   Use the provided ft1D() function to implement your 2D FTs.
+
+   The current forwardFT() and inverseFT() use the numpy fft2() and
+   ifft2() functions.  YOU MAY NOT USE THOSE FUNCTIONS.  You must
+   implement your own functions, without using any libraries.
+
+   Test your implementation by moving an image into the spectral
+   domain, then back to the spatial domain to see that it is unchanged
+   from the original image.
+
+3. Implement multiplyFTs() to provide convolution (by moving the current
+   filter and image into the spectral domain, multiplying them, and
+   moving the result back to the spatial domain).  Read the comments
+   for the multipyFTs() function first.
+
+   Test this by convolving an image with an 11x11 Gaussian filter, and
+   with an 11x11 box filter.
+
+4. Implement image editing in modulatePixels(): Where the mouse is
+   clicked on the image, the magnitude of the corresponding values in
+   the image array (and their reflection if the image is a FT) is to
+   be modulated within a given radius.  Use a Gaussian weighting, so
+   that most modulation occurs at the mouse click and less modulation
+   occurs farther away from the mouse click.
+
+   Test this by removing periodic noise from the sample images.
+
+5. Denoise as best you can the canvas, moon, and mariner6 images.
+
+To submit:
+
+   In a single directory called 'a2' put the following FIVE files:
+
+      README.txt - containing the name, student number, and netID of each
+		   person working on the assignment.  Include here any
+		   comments you have for the TA. 
+
+      main.py    - the modified code, well organized and well commented.
+
+      denoised_mariner.png
+      denoised_moon.png
+      denoised_canvas.png
+
+   YOU WILL LOSE 1 MARK IF YOU INCLUDE ANY OTHER FILES.  In particular,
+   do NOT include the 'filters' or 'images' directories, do NOT
+   include any Windows libraries (e.g. glut.dll, glut.lib, glut.h),
+   and do NOT include any OSX-specific directories (e.g. '__MACOSX').
+
+   Email the zipped a2, called a2.zip, to jstewart@cs.queensu.ca.
